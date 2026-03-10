@@ -9,7 +9,8 @@ from wpimath.geometry import (
 )
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpimath.units import inchesToMeters
-
+from wpilib import DriverStation
+from typing import Callable
 
 class NeoMotorConstants:
     free_speed_rpm: float = 5676
@@ -48,7 +49,7 @@ class IntakeConstants:
 
 
 class ShooterConstants:
-    get_shooter_rpm = (
+    get_shooter_rpm: Callable[[float], float] = (
         lambda dist: 0.345585037558 * exp(1.09866543407 * dist) + 26.1542760624
     )
 
@@ -118,3 +119,10 @@ class VisionConstants:
 class FieldConstants:
     red_hub_pose = Pose2d(11.834, 4.035, Rotation2d(0))
     blue_hub_pose = Pose2d(4.706, 4.035, Rotation2d(0))
+
+    if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
+        hub_x: float = red_hub_pose.X()
+        hub_y: float = red_hub_pose.Y()
+    else:
+        hub_x: float = blue_hub_pose.X()
+        hub_y: float = blue_hub_pose.Y()
