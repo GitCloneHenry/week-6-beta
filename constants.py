@@ -1,14 +1,74 @@
+from math import exp, pi
+from wpimath.geometry import Translation2d
+from wpimath.kinematics import SwerveDrive4Kinematics
+
+class NeoMotorConstants:
+    free_speed_rpm: float = 5676
+
+class KrakenX60Constants:
+    free_speed_rpm: float = 6136
+
+class KrakenX44Constants:
+    free_speed_rpm: float = 7644
+
+class CANConstants:
+    pigeon_id: int = 0
+    right_hopper_motor: int = 1
+    left_hopper_motor: int = 2
+    upper_roller_motor: int = 3
+    lower_roller_motor: int = 4
+    conveyor_motor: int = 5
+    trigger_motor: int = 6
+    right_intake_motor: int = 7
+    left_intake_motor: int = 8
+
 class HopperConstants:
-    pass
+    extended_position: float = 15.5
+    retracted_position: float = 0.0    
+
+    minimum_acceptable_closed_loop_error: float = 0.5
 
 class IntakeConstants:
-    pass
+    intake_speed: float = KrakenX44Constants.free_speed_rpm * 0.9
+    outtake_speed: float = -KrakenX44Constants.free_speed_rpm * 0.9
 
 class ShooterConstants:
-    pass
+    get_shooter_rpm = lambda dist : 0.345585037558 * exp(1.09866543407 * dist) + 26.1542760624
+
+    minimum_acceptable_closed_loop_error: float = 0.5
 
 class DriveConstants:
-    pass
+    max_speed_mps: float = 4.8
+    max_angular_speed_rps: float = 2 * pi
+    slow_mode_multiplier: float = 0.3
+
+    track_width_m: float = 0.5969
+    wheel_base_m: float = 0.5969
+    drive_kinematics: SwerveDrive4Kinematics = SwerveDrive4Kinematics(
+        Translation2d(wheel_base_m / 2, track_width_m / 2),
+        Translation2d(wheel_base_m / 2, -track_width_m / 2),
+        Translation2d(-wheel_base_m / 2, track_width_m / 2),
+        Translation2d(-wheel_base_m / 2, -track_width_m / 2)
+    )
+
+    front_left_angular_offset_rad: float = -pi / 2
+    front_right_angular_offset_rad: float = 0.0
+    back_left_angular_offset_rad: float = pi
+    back_right_angular_offset_rad: float = pi / 2
+
+    front_left_driving_id: int = 2
+    front_right_driving_id: int = 4
+    back_left_driving_id: int = 6
+    back_right_driving_id: int = 8
+
+    front_left_turning_id: int = 1
+    front_right_turning_id: int = 3
+    back_left_turning_id: int = 5
+    back_right_turning_id: int = 7
+
+    gyro_reversed: bool = False
+
+    set_x_duration_s: float = 0.25
 
 class ModuleConstants:
     pass
