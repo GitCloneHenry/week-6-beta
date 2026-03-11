@@ -52,6 +52,8 @@ class ShooterConstants:
     get_shooter_rpm: Callable[[float], float] = (
         lambda dist: 0.345585037558 * exp(1.09866543407 * dist) + 26.1542760624
     )
+    advancement_motor_rps: float = -90
+    conveyor_motor_rps: float = -90
 
     minimum_acceptable_closed_loop_error: float = 0.5
 
@@ -120,9 +122,6 @@ class FieldConstants:
     red_hub_pose = Pose2d(11.834, 4.035, Rotation2d(0))
     blue_hub_pose = Pose2d(4.706, 4.035, Rotation2d(0))
 
-    if DriverStation.getAlliance() == DriverStation.Alliance.kRed:
-        hub_x: float = red_hub_pose.X()
-        hub_y: float = red_hub_pose.Y()
-    else:
-        hub_x: float = blue_hub_pose.X()
-        hub_y: float = blue_hub_pose.Y()
+    hub_x, hub_y = (red_hub_pose.X(), red_hub_pose.Y()) if DriverStation.getAlliance() == DriverStation.Alliance.kRed else (blue_hub_pose.X(), blue_hub_pose.Y())
+
+    get_hub_dist: Callable[[Pose2d], float] = lambda pose : ((pose.X() - FieldConstants.hub_x) ** 2 + (pose.Y() - FieldConstants.hub_y) ** 2) ** 0.5

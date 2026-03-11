@@ -16,7 +16,6 @@ from photonlibpy.targeting import PhotonTrackedTarget
 
 class VisionSubsystem(StateSystem):
     def __init__(self, camera_name: str) -> None:
-        # Initialize the state machine
         super().__init__()
 
         try:
@@ -40,7 +39,6 @@ class VisionSubsystem(StateSystem):
         )
 
     def periodic(self):
-        # Run internal periodic functions
         super().periodic()
 
         if not hasattr(self, "photon_camera"):

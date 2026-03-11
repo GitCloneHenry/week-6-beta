@@ -38,12 +38,12 @@ class SwerveModuleSubsystem:
         )
 
         self.driving_spark.configure(
-            DriveConfigs.driving_config,
+            DriveConfigs.drive_motor_config,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters,
         )
         self.turning_spark.configure(
-            DriveConfigs.turning_config,
+            DriveConfigs.turning_motor_config,
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters,
         )

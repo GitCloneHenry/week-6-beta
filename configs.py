@@ -1,20 +1,55 @@
 from rev import SparkMaxConfig, FeedbackSensor, AbsoluteEncoderConfig
 
+from phoenix6.configs import TalonFXConfiguration, TalonFXSConfiguration
+from phoenix6.signals import MotorArrangementValue
+
 from constants import ModuleConstants
 
 from math import pi
 
 
 class HopperConfigs:
-    pass
+    hopper_motor_config = TalonFXSConfiguration()
+    hopper_slot0 = hopper_motor_config.slot0
+    motion_magic_configs = hopper_motor_config.motion_magic
+    limit_configs = hopper_motor_config.current_limits
+
+    hopper_motor_config.commutation.motor_arrangement = MotorArrangementValue.MINION_JST
+
+    hopper_slot0.k_p = 0.65
+    hopper_slot0.k_i = 0.15
+    hopper_slot0.k_d = 0.0
+
+    motion_magic_configs.motion_magic_cruise_velocity = 1600
+    motion_magic_configs.motion_magic_acceleration = 2400
+    motion_magic_configs.motion_magic_jerk = 3600
+
+    limit_configs.supply_current_limit_enable = True
+    limit_configs.supply_current_limit = 17.5
 
 
 class IntakeConfigs:
-    pass
+    intake_motor_config = TalonFXConfiguration()
+    intake_slot0 = intake_motor_config.slot0
+    limit_configs = intake_motor_config.current_limits
+
+    intake_slot0.k_p = 0.1
+    intake_slot0.k_i = 0.0
+    intake_slot0.k_d = 0.0
+
+    limit_configs.supply_current_limit_enable = True
+    limit_configs.supply_current_limit = 50
 
 
 class ShooterConfigs:
-    pass
+    roller_config = TalonFXConfiguration()
+    intake_slot0 = roller_config.slot0
+
+    intake_slot0.k_s = 0.18
+    intake_slot0.k_v = 0.121
+    intake_slot0.k_p = 0.05
+    intake_slot0.k_i = 0.01
+    intake_slot0.k_d = 0.002
 
 
 class DriveConfigs:
@@ -44,7 +79,7 @@ class DriveConfigs:
     turning_motor_config.absoluteEncoder.inverted(True).positionConversionFactor(
         turning_factor
     ).velocityConversionFactor(turning_factor / 60.0).apply(
-        AbsoluteEncoderConfig.Presets.REV_ThroughBoreEncoder
+        AbsoluteEncoderConfig.Presets.REV_ThroughBoreEncoder()
     )
     turning_motor_config.closedLoop.setFeedbackSensor(
         FeedbackSensor.kAbsoluteEncoder

@@ -1,5 +1,5 @@
-from math import cos, pi, sin
-from typing import List
+from math import pi
+from typing import Tuple
 from numpy import atan2
 import wpilib
 
@@ -7,17 +7,12 @@ from constants import (
     CANConstants,
     DriveConstants,
     FieldConstants,
-    OIConstants,
-    AutoConstants,
+    OIConstants
 )
-from pathplannerlib.controller import PPHolonomicDriveController
-from pathplannerlib.auto import AutoBuilder
-from pathplannerlib.config import RobotConfig, PIDConstants
-from pathplannerlib.util import DriveFeedforwards
 from phoenix6.hardware import Pigeon2
 from subsystems.swerve_module_subsystem import SwerveModuleSubsystem
 from subsystems.vision_subsystem import VisionSubsystem
-from wpilib import DriverStation, SmartDashboard
+from wpilib import DriverStation
 from wpimath.estimator import SwerveDrive4PoseEstimator
 from wpimath.geometry import Pose2d, Rotation2d
 from wpimath.kinematics import ChassisSpeeds, SwerveDrive4Kinematics, SwerveModuleState
@@ -95,12 +90,19 @@ class SwerveDriveSubsystem(Subsystem):
         )
 
     def apply_deadband(self, value: float, deadband: float) -> float:
-        """Applies a deadband to the given value. If the absolute value of the input is less than the deadband, returns 0. Otherwise, scales the input so that it starts from 0 at the edge of the deadband and reaches 1 at the maximum input."""
         if abs(value) < deadband:
             return 0.0
         else:
             return (value - deadband * (1 if value > 0 else -1)) / (1 - deadband)
 
+    def set_module_states(self, desired_states: Tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]):
+        SwerveDrive4Kinematics.desaturateWheelSpeeds(
+            desired_states, DriveConstants.max_speed_mps
+        )
+        self.front_left.setDesiredState(desired_states[0])
+        self.front_right.setDesiredState(desired_states[1])
+        self.back_left.setDesiredState(desired_states[2])
+        self.back_right.setDesiredState(desired_states[3])
 
     def default_drive(self, driver_controller: CommandXboxController, field_relative: bool = True):
         if DriverStation.isDisabled():
@@ -142,3 +144,79 @@ class SwerveDriveSubsystem(Subsystem):
             * DriveConstants.max_angular_speed_rps
             * (DriveConstants.slow_mode_multiplier if self.slow_mode_enabled else 1.0)
         )
+
+        if x_speed_delivered == 0 and y_speed_delivered == 0 and rot_delivered == 0:
+            if self.x_timer is None:
+                self.x_timer = wpilib.Timer.getFPGATimestamp()
+                self.set_module_states(
+                    DriveConstants.drive_kinematics.toSwerveModuleStates(
+                        ChassisSpeeds(0, 0, 0)
+                    )
+                )
+            if (
+                wpilib.Timer.getFPGATimestamp() - self.x_timer
+                > DriveConstants.set_x_duration_s
+            ):
+                self.set_x()
+            return
+
+        self.x_timer = None
+
+        swerve_module_states: Tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState] = DriveConstants.drive_kinematics.toSwerveModuleStates(
+            ChassisSpeeds.fromFieldRelativeSpeeds(
+                x_speed_delivered,
+                y_speed_delivered,
+                rot_delivered,
+                self.gyro.getRotation2d(),
+            )
+            if field_relative
+            else ChassisSpeeds(x_speed_delivered, y_speed_delivered, rot_delivered)
+        )
+        swerve_module_states = SwerveDrive4Kinematics.desaturateWheelSpeeds(
+            swerve_module_states, DriveConstants.max_speed_mps
+        )
+        self.set_module_states(swerve_module_states)
+    
+    def set_x(self):
+        self.front_left.setDesiredState(
+            SwerveModuleState(0, Rotation2d.fromDegrees(45))
+        )
+        self.front_right.setDesiredState(
+            SwerveModuleState(0, Rotation2d.fromDegrees(-45))
+        )
+        self.back_left.setDesiredState(
+            SwerveModuleState(0, Rotation2d.fromDegrees(-45))
+        )
+        self.back_right.setDesiredState(
+            SwerveModuleState(0, Rotation2d.fromDegrees(45))
+        )
+
+    def get_module_states(self) -> Tuple[SwerveModuleState, SwerveModuleState, SwerveModuleState, SwerveModuleState]:
+        # Get the current states of all four swerve modules and return them as a list.
+        return (
+            self.front_left.getState(),
+            self.front_right.getState(),
+            self.back_left.getState(),
+            self.back_right.getState(),
+        )
+
+    def reset_encoders(self):
+        # Reset the encoders on all four swerve modules. This should be used when the robot's position on the field is known with certainty, such as at the start of a match or after being picked up by the field staff.
+        self.front_left.reset_encoders()
+        self.back_left.reset_encoders()
+        self.front_right.reset_encoders()
+        self.back_right.reset_encoders()
+    
+    def zero_heading(self):
+        self.gyro.reset()
+
+    def smart_zero_heading(self):
+        alliance = DriverStation.getAlliance()
+
+        if alliance != None:
+            self.gyro.set_yaw(
+                self.get_pose().rotation().degrees()
+                + 180.0 * (alliance == DriverStation.Alliance.kRed)
+            )
+        else:
+            wpilib.reportError("Couldn't get alliance!")
