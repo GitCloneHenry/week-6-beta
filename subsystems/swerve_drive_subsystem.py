@@ -20,6 +20,10 @@ from commands2.button import CommandXboxController
 from commands2.subsystem import Subsystem
 from wpimath.controller import ProfiledPIDControllerRadians
 from wpimath.trajectory import TrapezoidProfileRadians
+from pathplannerlib.controller import PPHolonomicDriveController
+from pathplannerlib.auto import AutoBuilder
+from pathplannerlib.config import RobotConfig, PIDConstants
+from pathplannerlib.util import DriveFeedforwards
 
 class SwerveDriveSubsystem(Subsystem):
     front_left: SwerveModuleSubsystem = SwerveModuleSubsystem(
@@ -61,6 +65,26 @@ class SwerveDriveSubsystem(Subsystem):
             0.7, 0.1, 0.0, TrapezoidProfileRadians.Constraints(DriveConstants.max_angular_speed_rps, 1.5 * DriveConstants.max_angular_speed_rps))
         self.theta_pid_controller.enableContinuousInput(-pi, pi)
 
+        try:
+            robot_config = RobotConfig.fromGUISettings()
+
+            AutoBuilder.configure(
+                self.get_pose,
+                self.reset_pose,
+                self.get_robot_relative_speeds,
+                lambda speeds, feedforwards: self.drive_robot_relative(
+                    speeds, feedforwards
+                ),
+                PPHolonomicDriveController(
+                    PIDConstants(13.50, 5.6, 1.9), PIDConstants(9.75, 1.6, 0.6)
+                ),
+                robot_config,
+                lambda: DriverStation.getAlliance() == DriverStation.Alliance.kRed,
+                self,
+            )
+        except Exception as e:
+            wpilib.reportError("Error creating configs!")
+
 
     def periodic(self) -> None:
         self.odometry.update(
@@ -89,6 +113,9 @@ class SwerveDriveSubsystem(Subsystem):
             pose,
         )
 
+    def reset_pose(self, new_pose: Pose2d):
+        self.odometry.resetPose(new_pose)
+
     def apply_deadband(self, value: float, deadband: float) -> float:
         if abs(value) < deadband:
             return 0.0
@@ -103,6 +130,15 @@ class SwerveDriveSubsystem(Subsystem):
         self.front_right.setDesiredState(desired_states[1])
         self.back_left.setDesiredState(desired_states[2])
         self.back_right.setDesiredState(desired_states[3])
+
+    def drive_robot_relative(
+        self, speeds: ChassisSpeeds, feedforwards: DriveFeedforwards
+    ):
+        # Convert the desired chassis speeds to individual module states and set the modules to those states. The feedforwards are currently not used, but could be implemented in the future for more accurate control.
+        swerve_module_states = DriveConstants.drive_kinematics.toSwerveModuleStates(
+            speeds
+        )
+        self.set_module_states(swerve_module_states)
 
     def default_drive(self, driver_controller: CommandXboxController, field_relative: bool = True):
         if DriverStation.isDisabled():
@@ -199,6 +235,14 @@ class SwerveDriveSubsystem(Subsystem):
             self.back_left.getState(),
             self.back_right.getState(),
         )
+    
+    def get_robot_relative_speeds(self) -> ChassisSpeeds:
+        # Get the current module states and convert them to robot relative chassis speeds using the kinematics.
+        module_states = self.get_module_states()
+        robot_relative_speeds = DriveConstants.drive_kinematics.toChassisSpeeds(
+            module_states
+        )
+        return robot_relative_speeds
 
     def reset_encoders(self):
         # Reset the encoders on all four swerve modules. This should be used when the robot's position on the field is known with certainty, such as at the start of a match or after being picked up by the field staff.

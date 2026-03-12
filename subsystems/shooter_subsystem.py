@@ -5,12 +5,11 @@ from configs import ShooterConfigs
 from constants import CANConstants, ShooterConstants, FieldConstants
 from configs import ShooterConfigs
 from state_system import *
-from time import sleep
 
 from subsystems.swerve_drive_subsystem import SwerveDriveSubsystem
 
 
-class ShooterSubsytem(StateSystem):
+class ShooterSubsystem(StateSystem):
     upper_roller_motor = TalonFX(CANConstants.upper_roller_motor)
     lower_roller_motor = TalonFX(CANConstants.lower_roller_motor)
     conveyor_motor = TalonFX(CANConstants.conveyor_motor)
@@ -123,8 +122,7 @@ class ShooterSubsytem(StateSystem):
         self.conveyor_motor.set_control(
             VelocityVoltage(-ShooterConstants.conveyor_motor_rps)
         )
-
-    @state
+        
     def disable_shooter(self):
         self.upper_roller_motor.stopMotor()
         self.lower_roller_motor.stopMotor()
@@ -132,4 +130,3 @@ class ShooterSubsytem(StateSystem):
         self.trigger_motor.stopMotor()
         self.clear_queue()
         self.target_shooter_rps = None
-        return True

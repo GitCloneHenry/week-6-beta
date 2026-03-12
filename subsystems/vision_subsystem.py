@@ -13,6 +13,8 @@ from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
 from photonlibpy.targeting.photonPipelineResult import PhotonPipelineResult
 from photonlibpy.targeting import PhotonTrackedTarget
 
+from wpilib import RobotBase
+
 
 class VisionSubsystem(StateSystem):
     def __init__(self, camera_name: str) -> None:
@@ -40,6 +42,9 @@ class VisionSubsystem(StateSystem):
 
     def periodic(self):
         super().periodic()
+
+        if not RobotBase.isReal():
+            return
 
         if not hasattr(self, "photon_camera"):
             return
