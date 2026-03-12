@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from subsystems.hopper_subsystem import HopperSubsystem
 
+
 class IntakeSubsystem(StateSystem):
     left_intake = TalonFX(CANConstants.left_intake_motor)
     right_intake = TalonFX(CANConstants.right_intake_motor)
@@ -38,7 +39,7 @@ class IntakeSubsystem(StateSystem):
     def periodic(self):
         super().periodic()
 
-        if not hasattr(self, 'hopper_subsystem'):
+        if not hasattr(self, "hopper_subsystem"):
             return
 
         if self.hopper_subsystem.at_target() or self.position_override:

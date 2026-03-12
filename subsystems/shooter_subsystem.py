@@ -39,20 +39,14 @@ class ShooterSubsystem(StateSystem):
         super().periodic()
 
         if self.target_shooter_rps:
-            target_rps: float = ShooterConstants.get_shooter_rpm(FieldConstants.get_hub_dist(self.robot_drive.get_pose()))
+            target_rps: float = ShooterConstants.get_shooter_rpm(
+                FieldConstants.get_hub_dist(self.robot_drive.get_pose())
+            )
         else:
             target_rps: float = self.idle_shooter_rps
-        
-        self.upper_roller_motor.set_control(
-            VelocityVoltage(
-                target_rps
-            )
-        )
-        self.lower_roller_motor.set_control(
-            VelocityVoltage(
-                -target_rps
-            )
-        )
+
+        self.upper_roller_motor.set_control(VelocityVoltage(target_rps))
+        self.lower_roller_motor.set_control(VelocityVoltage(-target_rps))
 
     @state
     def start_conveyor(self):
@@ -61,13 +55,19 @@ class ShooterSubsystem(StateSystem):
 
     @state
     def init_shooter(self):
-        self.target_shooter_rps = FieldConstants.get_hub_dist(self.robot_drive.get_pose())
+        self.target_shooter_rps = FieldConstants.get_hub_dist(
+            self.robot_drive.get_pose()
+        )
         self.queue_state("ensure_velocity", 0)
         return True
 
     @state
     def ensure_velocity(self):
-        target_rps = self.target_shooter_rps if self.target_shooter_rps else self.idle_shooter_rps
+        target_rps = (
+            self.target_shooter_rps
+            if self.target_shooter_rps
+            else self.idle_shooter_rps
+        )
 
         return_condition = (
             abs(self.upper_roller_motor.get_velocity().value_as_double - target_rps)
@@ -93,7 +93,9 @@ class ShooterSubsystem(StateSystem):
 
     @state
     def shoot(self):
-        target_rps = ShooterConstants.get_shooter_rpm(FieldConstants.get_hub_dist(self.robot_drive.get_pose()))
+        target_rps = ShooterConstants.get_shooter_rpm(
+            FieldConstants.get_hub_dist(self.robot_drive.get_pose())
+        )
 
         self.upper_roller_motor.set_control(VelocityVoltage(target_rps))
         self.lower_roller_motor.set_control(VelocityVoltage(-target_rps))
@@ -122,7 +124,7 @@ class ShooterSubsystem(StateSystem):
         self.conveyor_motor.set_control(
             VelocityVoltage(-ShooterConstants.conveyor_motor_rps)
         )
-        
+
     def disable_shooter(self):
         self.upper_roller_motor.stopMotor()
         self.lower_roller_motor.stopMotor()

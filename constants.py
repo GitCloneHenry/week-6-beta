@@ -12,6 +12,7 @@ from wpimath.units import inchesToMeters
 from wpilib import DriverStation
 from typing import Callable
 
+
 class NeoMotorConstants:
     free_speed_rpm: float = 5676
 
@@ -122,6 +123,16 @@ class FieldConstants:
     red_hub_pose = Pose2d(11.834, 4.035, Rotation2d(0))
     blue_hub_pose = Pose2d(4.706, 4.035, Rotation2d(0))
 
-    hub_x, hub_y = (red_hub_pose.X(), red_hub_pose.Y()) if DriverStation.getAlliance() == DriverStation.Alliance.kRed else (blue_hub_pose.X(), blue_hub_pose.Y())
+    hub_x, hub_y = (
+        (red_hub_pose.X(), red_hub_pose.Y())
+        if DriverStation.getAlliance() == DriverStation.Alliance.kRed
+        else (blue_hub_pose.X(), blue_hub_pose.Y())
+    )
 
-    get_hub_dist: Callable[[Pose2d], float] = lambda pose : ((pose.X() - FieldConstants.hub_x) ** 2 + (pose.Y() - FieldConstants.hub_y) ** 2) ** 0.5
+    get_hub_dist: Callable[[Pose2d], float] = (
+        lambda pose: (
+            (pose.X() - FieldConstants.hub_x) ** 2
+            + (pose.Y() - FieldConstants.hub_y) ** 2
+        )
+        ** 0.5
+    )

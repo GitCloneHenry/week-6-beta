@@ -13,10 +13,11 @@ from subsystems.vision_subsystem import VisionSubsystem
 from wpilib import SendableChooser
 from pathplannerlib.auto import AutoBuilder
 
+
 class RobotContainer(StateSystem):
     hopper_subsystem: HopperSubsystem
     intake_subsystem: IntakeSubsystem
-    vision_subsystem: VisionSubsystem 
+    vision_subsystem: VisionSubsystem
     drive_subsystem: SwerveDriveSubsystem
     shooter_subsystem: ShooterSubsystem
 
@@ -24,13 +25,19 @@ class RobotContainer(StateSystem):
         self.hopper_subsystem: HopperSubsystem = HopperSubsystem()
         self.intake_subsystem: IntakeSubsystem = IntakeSubsystem()
         self.vision_subsystem: VisionSubsystem = VisionSubsystem("APTCam")
-        self.drive_subsystem: SwerveDriveSubsystem = SwerveDriveSubsystem(self.vision_subsystem)
-        self.shooter_subsystem: ShooterSubsystem = ShooterSubsystem(self.drive_subsystem)
+        self.drive_subsystem: SwerveDriveSubsystem = SwerveDriveSubsystem(
+            self.vision_subsystem
+        )
+        self.shooter_subsystem: ShooterSubsystem = ShooterSubsystem(
+            self.drive_subsystem
+        )
 
         self.hopper_subsystem.intake_subsystem = self.intake_subsystem
         self.intake_subsystem.hopper_subsystem = self.hopper_subsystem
 
-        self.driver_controller = CommandXboxController(OIConstants.driver_controller_port)
+        self.driver_controller = CommandXboxController(
+            OIConstants.driver_controller_port
+        )
 
         self.sendable_chooser: SendableChooser = AutoBuilder.buildAutoChooser()
 
@@ -42,7 +49,7 @@ class RobotContainer(StateSystem):
         self.hopper_subsystem.outtake()
         self.intake_subsystem.outtake()
         self.shooter_subsystem.outtake()
-    
+
     def retract(self):
         self.hopper_subsystem.retract()
         self.intake_subsystem.stop_rollers()
@@ -51,26 +58,24 @@ class RobotContainer(StateSystem):
     def set_controller_bindings(self):
         self.drive_subsystem.setDefaultCommand(
             RunCommand(
-                lambda: self.drive_subsystem.default_drive(self.driver_controller, True),
+                lambda: self.drive_subsystem.default_drive(
+                    self.driver_controller, True
+                ),
                 self.drive_subsystem,
             )
         )
 
         self.driver_controller.leftBumper().onTrue(
-            InstantCommand(lambda: self.drive_subsystem.zero_heading(), self.drive_subsystem)
+            InstantCommand(
+                lambda: self.drive_subsystem.zero_heading(), self.drive_subsystem
+            )
         )
 
-        self.driver_controller.povRight().onTrue(
-            InstantCommand(self.toggle_intake)
-        )
+        self.driver_controller.povRight().onTrue(InstantCommand(self.toggle_intake))
 
-        self.driver_controller.a().onTrue(
-            InstantCommand(self.outtake)
-        )
+        self.driver_controller.a().onTrue(InstantCommand(self.outtake))
 
-        self.driver_controller.a().onFalse(
-            InstantCommand(self.retract)
-        )
+        self.driver_controller.a().onFalse(InstantCommand(self.retract))
 
         self.driver_controller.b().onTrue(
             InstantCommand(lambda: self.intake_subsystem.toggle_intake_with_override())
@@ -81,9 +86,7 @@ class RobotContainer(StateSystem):
         )
 
         self.driver_controller.rightTrigger().onFalse(
-            InstantCommand(
-                lambda: self.shooter_subsystem.disable_shooter()
-            )
+            InstantCommand(lambda: self.shooter_subsystem.disable_shooter())
         )
 
     def get_autonomous_command(self):

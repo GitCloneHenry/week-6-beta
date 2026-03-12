@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from subsystems.intake_subsystem import IntakeSubsystem
 
+
 class HopperSubsystem(StateSystem):
     left_hopper_motor = TalonFXS(CANConstants.left_hopper_motor)
     right_hopper_motor = TalonFXS(CANConstants.right_hopper_motor)
@@ -31,13 +32,26 @@ class HopperSubsystem(StateSystem):
     def periodic(self):
         super().periodic()
 
-        self.left_hopper_motor.set_control(MotionMagicVoltage(self.target_hopper_position))
-        self.right_hopper_motor.set_control(MotionMagicVoltage(-self.target_hopper_position))
+        self.left_hopper_motor.set_control(
+            MotionMagicVoltage(self.target_hopper_position)
+        )
+        self.right_hopper_motor.set_control(
+            MotionMagicVoltage(-self.target_hopper_position)
+        )
 
-    def at_target(self) -> bool: 
-        left_error: float = abs(self.left_hopper_motor.get_position().value_as_double - self.target_hopper_position)
-        right_error: float = abs(self.right_hopper_motor.get_position().value_as_double - (-self.target_hopper_position))
-        return left_error < HopperConstants.minimum_acceptable_closed_loop_error and right_error < HopperConstants.minimum_acceptable_closed_loop_error
+    def at_target(self) -> bool:
+        left_error: float = abs(
+            self.left_hopper_motor.get_position().value_as_double
+            - self.target_hopper_position
+        )
+        right_error: float = abs(
+            self.right_hopper_motor.get_position().value_as_double
+            - (-self.target_hopper_position)
+        )
+        return (
+            left_error < HopperConstants.minimum_acceptable_closed_loop_error
+            and right_error < HopperConstants.minimum_acceptable_closed_loop_error
+        )
 
     def toggle_hopper(self):
         self.hopper_toggle = not self.hopper_toggle
