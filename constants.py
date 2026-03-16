@@ -10,7 +10,7 @@ from wpimath.geometry import (
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpimath.units import inchesToMeters
 from wpilib import DriverStation
-from typing import Callable
+from typing import Callable, Tuple
 
 
 class NeoMotorConstants:
@@ -41,7 +41,7 @@ class HopperConstants:
     extended_position: float = 15.5
     retracted_position: float = 0.0
 
-    minimum_acceptable_closed_loop_error: float = 0.5
+    minimum_acceptable_closed_loop_error: float = 1.0
 
 
 class IntakeConstants:
@@ -56,7 +56,7 @@ class ShooterConstants:
     advancement_motor_rps: float = -90
     conveyor_motor_rps: float = -90
 
-    minimum_acceptable_closed_loop_error: float = 0.5
+    minimum_acceptable_closed_loop_error: float = 1.0
 
 
 class DriveConstants:
@@ -123,16 +123,21 @@ class FieldConstants:
     red_hub_pose = Pose2d(11.834, 4.035, Rotation2d(0))
     blue_hub_pose = Pose2d(4.706, 4.035, Rotation2d(0))
 
-    hub_x, hub_y = (
-        (red_hub_pose.X(), red_hub_pose.Y())
-        if DriverStation.getAlliance() == DriverStation.Alliance.kRed
-        else (blue_hub_pose.X(), blue_hub_pose.Y())
-    )
-
-    get_hub_dist: Callable[[Pose2d], float] = (
-        lambda pose: (
-            (pose.X() - FieldConstants.hub_x) ** 2
-            + (pose.Y() - FieldConstants.hub_y) ** 2
+    @staticmethod
+    def get_hub_dist(pose: Pose2d) -> float:
+        hub_x, hub_y = (
+            (FieldConstants.red_hub_pose.X(), FieldConstants.red_hub_pose.Y())
+            if DriverStation.getAlliance() == DriverStation.Alliance.kRed
+            else (FieldConstants.blue_hub_pose.X(), FieldConstants.blue_hub_pose.Y())
         )
-        ** 0.5
-    )
+
+        return ((pose.X() - hub_x) ** 2 + (pose.Y() - hub_y) ** 2) ** 0.5
+
+    @staticmethod
+    def get_hub_pos() -> Tuple[float, float]:
+        hub_x, hub_y = (
+            (FieldConstants.red_hub_pose.X(), FieldConstants.red_hub_pose.Y())
+            if DriverStation.getAlliance() == DriverStation.Alliance.kRed
+            else (FieldConstants.blue_hub_pose.X(), FieldConstants.blue_hub_pose.Y())
+        )
+        return hub_x, hub_y

@@ -59,6 +59,8 @@ class SwerveDriveSubsystem(Subsystem):
 
     slow_mode_enabled: bool = False
 
+    x_timer: float | None = None
+
     def __init__(self, vision_subsystem: VisionSubsystem) -> None:
         self.vision_subsystem = vision_subsystem
 
@@ -186,10 +188,12 @@ class SwerveDriveSubsystem(Subsystem):
         )
 
         if driver_controller.leftTrigger().getAsBoolean():
+            hub_x, hub_y = FieldConstants.get_hub_pos()
+
             robot_pose: Pose2d = self.get_pose()
             angle_to_hub: float = -atan2(
-                FieldConstants.hub_y - robot_pose.Y(),
-                FieldConstants.hub_x - robot_pose.X(),
+                hub_y - robot_pose.Y(),
+                hub_x - robot_pose.X(),
             )
 
             rot = self.theta_pid_controller.calculate(

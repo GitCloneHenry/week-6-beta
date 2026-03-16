@@ -8,6 +8,8 @@ from state_system import *
 
 from subsystems.swerve_drive_subsystem import SwerveDriveSubsystem
 
+from wpilib import SmartDashboard
+
 
 class ShooterSubsystem(StateSystem):
     upper_roller_motor = TalonFX(CANConstants.upper_roller_motor)
@@ -34,19 +36,28 @@ class ShooterSubsystem(StateSystem):
         self.conveyor_motor.configurator.apply(ShooterConfigs.roller_config)
         self.trigger_motor.configurator.apply(ShooterConfigs.roller_config)
 
+        SmartDashboard.putNumber("Top Roller Multiplier", 1.0)
+        SmartDashboard.putNumber("Bottom Roller Multiplier", 1.0)
+
     def periodic(self):
         # Run internal periodic functions
         super().periodic()
 
         if self.target_shooter_rps:
-            target_rps: float = ShooterConstants.get_shooter_rpm(
-                FieldConstants.get_hub_dist(self.robot_drive.get_pose())
-            )
+            target_rps: float = self.target_shooter_rps
         else:
             target_rps: float = self.idle_shooter_rps
 
-        self.upper_roller_motor.set_control(VelocityVoltage(target_rps))
-        self.lower_roller_motor.set_control(VelocityVoltage(-target_rps))
+        self.upper_roller_motor.set_control(
+            VelocityVoltage(
+                target_rps * SmartDashboard.getNumber("Top Roller Multiplier", 1.0)
+            )
+        )
+        self.lower_roller_motor.set_control(
+            VelocityVoltage(
+                -target_rps * SmartDashboard.getNumber("Bottom Roller Multiplier", 1.0)
+            )
+        )
 
     @state
     def start_conveyor(self):
@@ -55,10 +66,10 @@ class ShooterSubsystem(StateSystem):
 
     @state
     def init_shooter(self):
-        self.target_shooter_rps = FieldConstants.get_hub_dist(
-            self.robot_drive.get_pose()
+        self.target_shooter_rps = ShooterConstants.get_shooter_rpm(
+            FieldConstants.get_hub_dist(self.robot_drive.get_pose())
         )
-        self.queue_state("ensure_velocity", 0)
+        print(self.target_shooter_rps)
         return True
 
     @state
@@ -70,14 +81,17 @@ class ShooterSubsystem(StateSystem):
         )
 
         return_condition = (
-            abs(self.upper_roller_motor.get_velocity().value_as_double - target_rps)
+            abs(
+                self.upper_roller_motor.get_velocity().value_as_double
+                - target_rps * SmartDashboard.getNumber("Top Roller Multiplier", 1.0)
+            )
             < ShooterConstants.minimum_acceptable_closed_loop_error
-            and abs(self.lower_roller_motor.get_velocity().value_as_double - target_rps)
+            and abs(
+                self.lower_roller_motor.get_velocity().value_as_double
+                + target_rps * SmartDashboard.getNumber("Bottom Roller Multiplier", 1.0)
+            )
             < ShooterConstants.minimum_acceptable_closed_loop_error
         )
-
-        if return_condition:
-            self.queue_state("advance_balls", 0)
 
         return return_condition
 
@@ -93,23 +107,9 @@ class ShooterSubsystem(StateSystem):
 
     @state
     def shoot(self):
-        target_rps = ShooterConstants.get_shooter_rpm(
+        self.target_shooter_rps = ShooterConstants.get_shooter_rpm(
             FieldConstants.get_hub_dist(self.robot_drive.get_pose())
         )
-
-        self.upper_roller_motor.set_control(VelocityVoltage(target_rps))
-        self.lower_roller_motor.set_control(VelocityVoltage(-target_rps))
-
-        if not (
-            abs(self.upper_roller_motor.get_velocity().value_as_double - target_rps)
-            < ShooterConstants.minimum_acceptable_closed_loop_error
-            and abs(self.lower_roller_motor.get_velocity().value_as_double + target_rps)
-            < ShooterConstants.minimum_acceptable_closed_loop_error
-        ):
-            return False
-
-        self.set_intake_roller_speed()
-
         return False
 
     def set_intake_roller_speed(self):
@@ -130,5 +130,5 @@ class ShooterSubsystem(StateSystem):
         self.lower_roller_motor.stopMotor()
         self.conveyor_motor.stopMotor()
         self.trigger_motor.stopMotor()
-        self.clear_queue()
         self.target_shooter_rps = None
+        self.clear_queue()

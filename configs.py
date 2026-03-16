@@ -46,10 +46,10 @@ class ShooterConfigs:
     intake_slot0 = roller_config.slot0
 
     intake_slot0.k_s = 0.18
-    intake_slot0.k_v = 0.121
+    intake_slot0.k_v = 0.12
     intake_slot0.k_p = 0.05
-    intake_slot0.k_i = 0.01
-    intake_slot0.k_d = 0.002
+    intake_slot0.k_i = 0.003
+    intake_slot0.k_d = 0.01
 
 
 class DriveConfigs:

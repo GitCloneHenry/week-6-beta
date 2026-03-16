@@ -41,9 +41,11 @@ class RobotContainer(StateSystem):
 
         self.sendable_chooser: SendableChooser = AutoBuilder.buildAutoChooser()
 
+        self.set_controller_bindings()
+
     def toggle_intake(self):
-        self.hopper_subsystem.toggle_hopper()
         self.intake_subsystem.toggle_intake()
+        self.hopper_subsystem.toggle_hopper()
 
     def outtake(self):
         self.hopper_subsystem.outtake()
@@ -82,7 +84,11 @@ class RobotContainer(StateSystem):
         )
 
         self.driver_controller.rightTrigger().onTrue(
-            InstantCommand(lambda: self.shooter_subsystem.queue_states("shoot"))
+            InstantCommand(
+                lambda: self.shooter_subsystem.queue_states(
+                    "init_shooter", "ensure_velocity", "advance_balls", "shoot"
+                )
+            )
         )
 
         self.driver_controller.rightTrigger().onFalse(
