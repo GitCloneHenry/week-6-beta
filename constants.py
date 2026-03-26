@@ -1,4 +1,4 @@
-from math import exp, pi
+from math import pi
 from wpimath.geometry import (
     Translation2d,
     Translation3d,
@@ -10,7 +10,7 @@ from wpimath.geometry import (
 from wpimath.kinematics import SwerveDrive4Kinematics
 from wpimath.units import inchesToMeters
 from wpilib import DriverStation
-from typing import Callable, Tuple
+from typing import Dict, Tuple
 
 
 class NeoMotorConstants:
@@ -50,13 +50,125 @@ class IntakeConstants:
 
 
 class ShooterConstants:
-    get_shooter_rpm: Callable[[float], float] = (
-        lambda dist: 0.345585037558 * exp(1.09866543407 * dist) + 26.1542760624
-    )
     advancement_motor_rps: float = -90
     conveyor_motor_rps: float = -90
 
     minimum_acceptable_closed_loop_error: float = 1.0
+
+    rpm_table: Dict[float, float] = {
+        0.55: 6000,
+        0.60: 3750,
+        0.65: 2344,
+        0.70: 1922,
+        0.75: 1781,
+        0.80: 1711,
+        0.85: 1641,
+        0.90: 1605,
+        0.95: 1570,
+        1.00: 1570,
+        1.05: 1570,
+        1.10: 1570,
+        1.15: 1570,
+        1.20: 1570,
+        1.25: 1570,
+        1.30: 1570,
+        1.35: 1588,
+        1.40: 1588,
+        1.45: 1605,
+        1.50: 1623,
+        1.55: 1623,
+        1.60: 1641,
+        1.65: 1658,
+        1.70: 1667,
+        1.75: 1676,
+        1.80: 1693,
+        1.85: 1711,
+        1.90: 1720,
+        1.95: 1737,
+        2.00: 1746,
+        2.05: 1764,
+        2.10: 1781,
+        2.15: 1790,
+        2.20: 1808,
+        2.25: 1816,
+        2.30: 1834,
+        2.35: 1852,
+        2.40: 1860,
+        2.45: 1878,
+        2.50: 1896,
+        2.55: 1904,
+        2.60: 1922,
+        2.65: 1939,
+        2.70: 1948,
+        2.75: 1966,
+        2.80: 1979,
+        2.85: 1992,
+        2.90: 2010,
+        2.95: 2019,
+        3.00: 2036,
+        3.05: 2049,
+        3.10: 2063,
+        3.15: 2080,
+        3.20: 2093,
+        3.25: 2106,
+        3.30: 2120,
+        3.35: 2133,
+        3.40: 2150,
+        3.45: 2159,
+        3.50: 2177,
+        3.55: 2190,
+        3.60: 2203,
+        3.65: 2216,
+        3.70: 2229,
+        3.75: 2247,
+        3.80: 2256,
+        3.85: 2273,
+        3.90: 2282,
+        3.95: 2300,
+        4.00: 2313,
+        4.05: 2326,
+        4.10: 2339,
+        4.15: 2353,
+        4.20: 2366,
+        4.25: 2379,
+        4.30: 2392,
+        4.35: 2405,
+        4.40: 2418,
+        4.45: 2432,
+        4.50: 2445,
+        4.55: 2458,
+        4.60: 2471,
+        4.65: 2484,
+        4.70: 2498,
+        4.75: 2511,
+        4.80: 2524,
+        4.85: 2537,
+        4.90: 2546,
+        4.95: 2559,
+        5.00: 2572,
+    }
+
+    @staticmethod
+    def get_shooter_rpm(distance: float) -> float:
+        if distance <= 0.55:
+            return ShooterConstants.rpm_table[0.55]
+        elif distance >= 5.0:
+            return ShooterConstants.rpm_table[5.0]
+        else:
+            lower_bound = max(
+                key for key in ShooterConstants.rpm_table.keys() if key <= distance
+            )
+            upper_bound = min(
+                key for key in ShooterConstants.rpm_table.keys() if key >= distance
+            )
+
+            lower_rpm = ShooterConstants.rpm_table[lower_bound]
+            upper_rpm = ShooterConstants.rpm_table[upper_bound]
+
+            rpm = lower_rpm + (upper_rpm - lower_rpm) * (
+                (distance - lower_bound) / (upper_bound - lower_bound)
+            )
+            return rpm
 
 
 class DriveConstants:
@@ -113,9 +225,20 @@ class OIConstants:
 
 
 class VisionConstants:
-    robot_to_camera = Transform3d(
-        Translation3d(inchesToMeters(-12.5), 0, inchesToMeters(15.0)),
-        Rotation3d(pi / 6, pi, 0),
+    left_camera_name = "APTCam1"
+    right_camera_name = "APTCam2"
+
+    robot_to_left_camera = Transform3d(
+        Translation3d(
+            inchesToMeters(-12.5102), inchesToMeters(-0.9959), inchesToMeters(16.9634)
+        ),
+        Rotation3d(pi / 6, pi + 14.551811 * pi / 180, 0),
+    )
+    robot_to_right_camera = Transform3d(
+        Translation3d(
+            inchesToMeters(-12.5102), inchesToMeters(0.9959), inchesToMeters(16.9634)
+        ),
+        Rotation3d(pi / 6, pi - 14.551811 * pi / 180, 0),
     )
 
 

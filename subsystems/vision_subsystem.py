@@ -5,9 +5,9 @@ from state_system import *
 
 from robotpy_apriltag import AprilTagFieldLayout, AprilTagField
 
-from wpimath.geometry import Pose3d
+from wpimath.geometry import Pose3d, Transform3d
 
-from photonlibpy import PhotonCamera, PhotonPoseEstimator, EstimatedRobotPose
+from photonlibpy import PhotonCamera, PhotonPoseEstimator
 
 from photonlibpy.photonPoseEstimator import PhotonPoseEstimator
 from photonlibpy.targeting.photonPipelineResult import PhotonPipelineResult
@@ -15,10 +15,23 @@ from photonlibpy.targeting import PhotonTrackedTarget
 
 from wpilib import RobotBase
 
+from subsystems.swerve_drive_subsystem import SwerveDriveSubsystem
+
+
+class VisionCamera:
+    def __init__(self, camera_name: str, robot_to_camera: Transform3d):
+        self.camera = PhotonCamera(camera_name)
+        self.estimator = PhotonPoseEstimator(
+            AprilTagFieldLayout.loadField(AprilTagField.kDefaultField),
+            robot_to_camera,
+        )
+
 
 class VisionSubsystem(StateSystem):
-    def __init__(self, camera_name: str) -> None:
+    def __init__(self, drive_subsystem: SwerveDriveSubsystem) -> None:
         super().__init__()
+
+        self.drive_subsystem: SwerveDriveSubsystem = drive_subsystem
 
         try:
             self.april_tag_field_layout = AprilTagFieldLayout.loadField(
@@ -27,18 +40,14 @@ class VisionSubsystem(StateSystem):
         except RuntimeError as e:
             raise e
 
-        self.photon_camera = PhotonCamera(camera_name)
-
-        self.pose_estimator = PhotonPoseEstimator(
-            self.april_tag_field_layout,
-            VisionConstants.robot_to_camera,
-        )
-
-        self.robot_pose: EstimatedRobotPose | None = EstimatedRobotPose(
-            Pose3d(),
-            0,
-            [],
-        )
+        self.cameras: List[VisionCamera] = [
+            VisionCamera(
+                VisionConstants.left_camera_name, VisionConstants.robot_to_left_camera
+            ),
+            VisionCamera(
+                VisionConstants.right_camera_name, VisionConstants.robot_to_right_camera
+            ),
+        ]
 
     def periodic(self):
         super().periodic()
@@ -49,33 +58,33 @@ class VisionSubsystem(StateSystem):
         if not hasattr(self, "photon_camera"):
             return
 
-        camera_results: List[PhotonPipelineResult] = (
-            self.photon_camera.getAllUnreadResults()
-        )
-
-        if len(camera_results) == 0:
-            self.robot_pose = None
-            return
-
-        for result in camera_results:
-            if not result.hasTargets():
-                continue
-
-            best_target: PhotonTrackedTarget | None = result.getBestTarget()
-
-            if best_target == None:
-                continue
-
-            potential_tag_pose: Pose3d | None = self.april_tag_field_layout.getTagPose(
-                best_target.getFiducialId()
+        for camera in self.cameras:
+            camera_results: List[PhotonPipelineResult] = (
+                camera.camera.getAllUnreadResults()
             )
 
-            if not potential_tag_pose == None:
-                self.best_april_tag_pose = potential_tag_pose.toPose2d()
+            for result in camera_results:
+                if not result.hasTargets():
+                    continue
 
-            self.robot_pose = self.pose_estimator.estimateCoprocMultiTagPose(result)
+                best_target: PhotonTrackedTarget | None = result.getBestTarget()
 
-            if self.robot_pose is None:
-                self.robot_pose = self.pose_estimator.estimateLowestAmbiguityPose(
-                    result
+                if best_target == None:
+                    continue
+
+                potential_tag_pose: Pose3d | None = (
+                    self.april_tag_field_layout.getTagPose(best_target.getFiducialId())
                 )
+
+                if not potential_tag_pose == None:
+                    self.best_april_tag_pose = potential_tag_pose.toPose2d()
+
+                robot_pose = camera.estimator.estimateCoprocMultiTagPose(result)
+
+                if robot_pose is None:
+                    robot_pose = camera.estimator.estimateLowestAmbiguityPose(result)
+
+                if robot_pose:
+                    self.drive_subsystem.odometry.addVisionMeasurement(
+                        robot_pose.estimatedPose.toPose2d(), robot_pose.timestampSeconds
+                    )

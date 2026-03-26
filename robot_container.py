@@ -24,10 +24,7 @@ class RobotContainer(StateSystem):
     def __init__(self) -> None:
         self.hopper_subsystem: HopperSubsystem = HopperSubsystem()
         self.intake_subsystem: IntakeSubsystem = IntakeSubsystem()
-        self.vision_subsystem: VisionSubsystem = VisionSubsystem("APTCam")
-        self.drive_subsystem: SwerveDriveSubsystem = SwerveDriveSubsystem(
-            self.vision_subsystem
-        )
+        self.drive_subsystem: SwerveDriveSubsystem = SwerveDriveSubsystem()
         self.shooter_subsystem: ShooterSubsystem = ShooterSubsystem(
             self.drive_subsystem
         )
