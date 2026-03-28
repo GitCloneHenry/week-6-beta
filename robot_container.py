@@ -28,6 +28,7 @@ class RobotContainer(StateSystem):
         self.shooter_subsystem: ShooterSubsystem = ShooterSubsystem(
             self.drive_subsystem
         )
+        self.vision_subsystem: VisionSubsystem = VisionSubsystem(self.drive_subsystem)
 
         self.hopper_subsystem.intake_subsystem = self.intake_subsystem
         self.intake_subsystem.hopper_subsystem = self.hopper_subsystem

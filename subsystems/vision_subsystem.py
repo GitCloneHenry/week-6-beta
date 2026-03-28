@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from constants import VisionConstants
 
 from state_system import *
@@ -29,9 +29,27 @@ class VisionCamera:
 
 class VisionSubsystem(StateSystem):
     def __init__(self, drive_subsystem: SwerveDriveSubsystem) -> None:
+        self.drive_subsystem: SwerveDriveSubsystem = drive_subsystem    
+        
+        self.cameras: Tuple[VisionCamera, VisionCamera] = (
+            VisionCamera(
+                VisionConstants.left_camera_name, VisionConstants.robot_to_left_camera
+            ),
+            VisionCamera(
+                VisionConstants.right_camera_name, VisionConstants.robot_to_right_camera
+            ),
+        )
+
         super().__init__()
 
-        self.drive_subsystem: SwerveDriveSubsystem = drive_subsystem
+    def periodic(self):
+        super().periodic()
+
+        if not RobotBase.isReal():
+            return
+        
+        if not hasattr(self, "cameras"):
+            return
 
         try:
             self.april_tag_field_layout = AprilTagFieldLayout.loadField(
@@ -39,24 +57,6 @@ class VisionSubsystem(StateSystem):
             )
         except RuntimeError as e:
             raise e
-
-        self.cameras: List[VisionCamera] = [
-            VisionCamera(
-                VisionConstants.left_camera_name, VisionConstants.robot_to_left_camera
-            ),
-            VisionCamera(
-                VisionConstants.right_camera_name, VisionConstants.robot_to_right_camera
-            ),
-        ]
-
-    def periodic(self):
-        super().periodic()
-
-        if not RobotBase.isReal():
-            return
-
-        if not hasattr(self, "photon_camera"):
-            return
 
         for camera in self.cameras:
             camera_results: List[PhotonPipelineResult] = (
@@ -88,3 +88,4 @@ class VisionSubsystem(StateSystem):
                     self.drive_subsystem.odometry.addVisionMeasurement(
                         robot_pose.estimatedPose.toPose2d(), robot_pose.timestampSeconds
                     )
+                    

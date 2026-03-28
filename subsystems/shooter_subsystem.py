@@ -17,7 +17,7 @@ class ShooterSubsystem(StateSystem):
     conveyor_motor = TalonFX(CANConstants.conveyor_motor)
     trigger_motor = TalonFX(CANConstants.trigger_motor)
 
-    idle_shooter_rps = ShooterConstants.get_shooter_rpm(0)
+    idle_shooter_rps = 20
     target_shooter_rps: float | None = None
 
     def __init__(self, robot_drive: SwerveDriveSubsystem):

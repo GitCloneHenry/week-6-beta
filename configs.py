@@ -16,7 +16,7 @@ class HopperConfigs:
 
     hopper_motor_config.commutation.motor_arrangement = MotorArrangementValue.MINION_JST
 
-    hopper_slot0.k_p = 0.65
+    hopper_slot0.k_p = 0.55
     hopper_slot0.k_i = 0.15
     hopper_slot0.k_d = 0.0
 
@@ -38,7 +38,7 @@ class IntakeConfigs:
     intake_slot0.k_d = 0.0
 
     limit_configs.supply_current_limit_enable = True
-    limit_configs.supply_current_limit = 50
+    limit_configs.supply_current_limit = 80
 
 
 class ShooterConfigs:

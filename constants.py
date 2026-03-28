@@ -39,7 +39,7 @@ class CANConstants:
 
 class HopperConstants:
     extended_position: float = 15.5
-    retracted_position: float = 0.0
+    retracted_position: float = 0.5
 
     minimum_acceptable_closed_loop_error: float = 1.0
 
@@ -152,9 +152,9 @@ class ShooterConstants:
     @staticmethod
     def get_shooter_rpm(distance: float) -> float:
         if distance <= 0.55:
-            return ShooterConstants.rpm_table[0.55]
+            return ShooterConstants.rpm_table[0.55] / 60.0
         elif distance >= 5.0:
-            return ShooterConstants.rpm_table[5.0]
+            return ShooterConstants.rpm_table[5.0] / 60.0
         else:
             lower_bound = max(
                 key for key in ShooterConstants.rpm_table.keys() if key <= distance
@@ -169,7 +169,7 @@ class ShooterConstants:
             rpm = lower_rpm + (upper_rpm - lower_rpm) * (
                 (distance - lower_bound) / (upper_bound - lower_bound)
             )
-            return rpm
+            return rpm / 60.0
 
 
 class DriveConstants:
