@@ -11,8 +11,10 @@ from subsystems.swerve_drive_subsystem import SwerveDriveSubsystem
 from subsystems.vision_subsystem import VisionSubsystem
 
 from wpilib import SendableChooser
-from pathplannerlib.auto import AutoBuilder
-
+from pathplannerlib.auto import AutoBuilder, NamedCommands, Pose2d
+from pathplannerlib.path import PathConstraints
+from wpimath.geometry import Rotation2d
+from wpimath.units import degreesToRadians
 
 class RobotContainer(StateSystem):
     hopper_subsystem: HopperSubsystem
@@ -54,6 +56,13 @@ class RobotContainer(StateSystem):
         self.hopper_subsystem.retract()
         self.intake_subsystem.stop_rollers()
         self.shooter_subsystem.disable_shooter()
+
+    def register_named_commands(self):
+        NamedCommands.registerCommand("shoot", InstantCommand(
+                lambda: self.shooter_subsystem.queue_states(
+                    "init_shooter", "ensure_velocity", "advance_balls", "shoot"
+                )
+            ))
 
     def set_controller_bindings(self):
         self.drive_subsystem.setDefaultCommand(

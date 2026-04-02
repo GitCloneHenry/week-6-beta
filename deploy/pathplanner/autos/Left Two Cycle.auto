@@ -11,15 +11,15 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "Left To Shoot"
+          }
+        },
+        {
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "driveToShoot"
-                }
-              },
               {
                 "type": "named",
                 "data": {
@@ -42,15 +42,15 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "Left To Shoot"
+          }
+        },
+        {
           "type": "sequential",
           "data": {
             "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "driveToShoot"
-                }
-              },
               {
                 "type": "named",
                 "data": {

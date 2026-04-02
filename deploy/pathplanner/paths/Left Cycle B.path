@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.405181818181818,
-        "y": 5.663477272727273
+        "x": 3.405,
+        "y": 5.05
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4881136363636358,
-        "y": 7.7145340909090905
+        "x": 1.2054921540656212,
+        "y": 7.521968616262482
       },
       "isLocked": false,
-      "linkedName": "Left Cycle A End"
+      "linkedName": "Left Shooting Position"
     },
     {
       "anchor": {
@@ -222,7 +222,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": 138.6625535358333
   },
   "useDefaultConstraints": true
 }

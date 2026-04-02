@@ -246,8 +246,10 @@ class VisionConstants:
 
 
 class FieldConstants:
-    red_hub_pose = Pose2d(11.834, 4.035, Rotation2d(0))
-    blue_hub_pose = Pose2d(4.706, 4.035, Rotation2d(0))
+    # red_hub_pose = Pose2d(11.834, 4.035, Rotation2d(0))
+    red_hub_pose = Pose2d(11.920, 4.035, Rotation2d(0))
+    # blue_hub_pose = Pose2d(4.706, 4.035, Rotation2d(0))
+    blue_hub_pose = Pose2d(4.630, 4.035, Rotation2d(0))
 
     @staticmethod
     def get_hub_dist(pose: Pose2d) -> float:
