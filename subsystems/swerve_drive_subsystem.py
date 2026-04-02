@@ -91,7 +91,7 @@ class SwerveDriveSubsystem(Subsystem):
                 lambda: DriverStation.getAlliance() == DriverStation.Alliance.kRed,
                 self,
             )
-        except Exception as e:
+        except:
             wpilib.reportError("Error creating configs!")
 
     def periodic(self) -> None:
@@ -286,7 +286,7 @@ class SwerveDriveSubsystem(Subsystem):
         if alliance != None:
             self.gyro.set_yaw(
                 self.get_pose().rotation().degrees()
-                + 180.0 * (alliance == DriverStation.Alliance.kRed)
+                + 180.0 * (alliance == DriverStation.Alliance.kBlue)
             )
         else:
             wpilib.reportError("Couldn't get alliance!")

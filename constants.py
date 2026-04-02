@@ -55,6 +55,8 @@ class ShooterConstants:
 
     minimum_acceptable_closed_loop_error: float = 1.0
 
+    backspin_multiplier: float = 1.25
+
     # Values calculated using 5962's ProjectileSimulator (https://github.com/eeveemara/frc-fire-control)
     rpm_table: Dict[float, float] = {
         0.55: 6000,
@@ -201,13 +203,13 @@ class DriveConstants:
     back_left_turning_id: int = 5
     back_right_turning_id: int = 7
 
-    gyro_reversed: bool = False
+    gyro_reversed: bool = True
 
     set_x_duration_s: float = 0.25
 
 
 class ModuleConstants:
-    driving_motor_pinion_teeth: int = 12
+    driving_motor_pinion_teeth: int = 13
 
     driving_motor_free_speed_rps = NeoMotorConstants.free_speed_rpm / 60.0
     wheel_diameter_m = 0.0762
@@ -233,13 +235,13 @@ class VisionConstants:
         Translation3d(
             inchesToMeters(-12.5102), inchesToMeters(-0.9959), inchesToMeters(16.9634)
         ),
-        Rotation3d(pi / 6, pi + 14.551811 * pi / 180, 0),
+        Rotation3d(pi / 6, pi - 14.551811 * pi / 180 - 7 * pi / 180, 0),
     )
     robot_to_right_camera = Transform3d(
         Translation3d(
             inchesToMeters(-12.5102), inchesToMeters(0.9959), inchesToMeters(16.9634)
         ),
-        Rotation3d(pi / 6, pi - 14.551811 * pi / 180, 0),
+        Rotation3d(pi / 6, pi + 14.551811 * pi / 180 - 7 * pi / 180, 0),
     )
 
 

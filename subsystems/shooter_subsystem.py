@@ -5,11 +5,9 @@ from configs import ShooterConfigs
 from constants import CANConstants, ShooterConstants, FieldConstants
 from configs import ShooterConfigs
 from state_system import *
+from math import pi, sin
 
 from subsystems.swerve_drive_subsystem import SwerveDriveSubsystem
-
-from wpilib import SmartDashboard
-
 
 class ShooterSubsystem(StateSystem):
     upper_roller_motor = TalonFX(CANConstants.upper_roller_motor)
@@ -36,9 +34,6 @@ class ShooterSubsystem(StateSystem):
         self.conveyor_motor.configurator.apply(ShooterConfigs.roller_config)
         self.trigger_motor.configurator.apply(ShooterConfigs.roller_config)
 
-        SmartDashboard.putNumber("Top Roller Multiplier", 1.0)
-        SmartDashboard.putNumber("Bottom Roller Multiplier", 1.0)
-
     def periodic(self):
         # Run internal periodic functions
         super().periodic()
@@ -48,16 +43,35 @@ class ShooterSubsystem(StateSystem):
         else:
             target_rps: float = self.idle_shooter_rps
 
+            time = wpilib.Timer.getFPGATimestamp() * 10 * pi
+            power_applied: float = (self.sign(sin(time)) * (abs(sin(time)) ** 1.2) + 0.1 * sin(10 * time)) / 11 * 3
+            
+            self.trigger_motor.set(
+                power_applied
+            )
+            self.conveyor_motor.set(
+                power_applied
+            )
+
         self.upper_roller_motor.set_control(
             VelocityVoltage(
-                target_rps * SmartDashboard.getNumber("Top Roller Multiplier", 1.0)
+                target_rps
             )
         )
         self.lower_roller_motor.set_control(
             VelocityVoltage(
-                -target_rps * SmartDashboard.getNumber("Bottom Roller Multiplier", 1.0)
+                -target_rps * ShooterConstants.backspin_multiplier
             )
         )
+
+    @staticmethod
+    def sign(x: float) -> float:
+        if x > 0:
+            return 1.0
+        elif x < 0:
+            return -1.0
+        else:
+            return 0.0
 
     @state
     def start_conveyor(self):
@@ -83,12 +97,12 @@ class ShooterSubsystem(StateSystem):
         return_condition = (
             abs(
                 self.upper_roller_motor.get_velocity().value_as_double
-                - target_rps * SmartDashboard.getNumber("Top Roller Multiplier", 1.0)
+                - target_rps 
             )
             < ShooterConstants.minimum_acceptable_closed_loop_error
             and abs(
                 self.lower_roller_motor.get_velocity().value_as_double
-                + target_rps * SmartDashboard.getNumber("Bottom Roller Multiplier", 1.0)
+                + target_rps * ShooterConstants.backspin_multiplier
             )
             < ShooterConstants.minimum_acceptable_closed_loop_error
         )
