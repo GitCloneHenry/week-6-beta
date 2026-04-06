@@ -88,8 +88,6 @@ class RobotContainer(StateSystem):
 
         self.driver_controller.a().onTrue(InstantCommand(self.outtake))
 
-        self.driver_controller.a().onFalse(InstantCommand(self.retract))
-
         self.driver_controller.b().onTrue(
             InstantCommand(lambda: self.intake_subsystem.toggle_intake_with_override())
         )
