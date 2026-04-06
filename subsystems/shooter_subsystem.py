@@ -6,8 +6,10 @@ from constants import CANConstants, ShooterConstants, FieldConstants
 from configs import ShooterConfigs
 from state_system import *
 from math import pi, sin
+from wpimath.geometry import Pose2d
 
 from subsystems.swerve_drive_subsystem import SwerveDriveSubsystem
+
 
 class ShooterSubsystem(StateSystem):
     upper_roller_motor = TalonFX(CANConstants.upper_roller_motor)
@@ -43,25 +45,40 @@ class ShooterSubsystem(StateSystem):
         else:
             target_rps: float = self.idle_shooter_rps
 
-            time = wpilib.Timer.getFPGATimestamp() * 10 * pi
-            power_applied: float = (self.sign(sin(time)) * (abs(sin(time)) ** 1.2) + 0.1 * sin(10 * time)) / 11 * 3
-            
-            self.trigger_motor.set(
-                power_applied
-            )
-            self.conveyor_motor.set(
-                power_applied
+            time = wpilib.Timer.getFPGATimestamp() * 7.5 * pi
+            power_applied: float = (
+                (self.sign(sin(time)) * (abs(sin(time)) ** 1.2) + 0.1 * sin(10 * time))
+                / 11
+                * 2.5
             )
 
+            self.trigger_motor.set(power_applied)
+            self.conveyor_motor.set(power_applied)
+
+        robot_pose: Pose2d = self.robot_drive.get_pose()
+
+        in_center: bool = (
+            FieldConstants.blue_alliance_end
+            < robot_pose.X()
+            < FieldConstants.red_alliance_start
+        )
+
+        upper_multiplier: float = (
+            ShooterConstants.topspin_multiplier
+            if in_center
+            else ShooterConstants.backspin_correction_multiplier
+        )
+        lower_multiplier: float = (
+            ShooterConstants.topspin_correction_multiplier
+            if in_center
+            else ShooterConstants.backspin_multiplier
+        )
+
         self.upper_roller_motor.set_control(
-            VelocityVoltage(
-                target_rps
-            )
+            VelocityVoltage(target_rps * upper_multiplier)
         )
         self.lower_roller_motor.set_control(
-            VelocityVoltage(
-                -target_rps * ShooterConstants.backspin_multiplier
-            )
+            VelocityVoltage(-target_rps * lower_multiplier)
         )
 
     @staticmethod
@@ -80,10 +97,11 @@ class ShooterSubsystem(StateSystem):
 
     @state
     def init_shooter(self):
+        self.trigger_motor.set(0)
+        self.conveyor_motor.set(0)
         self.target_shooter_rps = ShooterConstants.get_shooter_rpm(
             FieldConstants.get_hub_dist(self.robot_drive.get_pose())
         )
-        print(self.target_shooter_rps)
         return True
 
     @state
@@ -95,10 +113,7 @@ class ShooterSubsystem(StateSystem):
         )
 
         return_condition = (
-            abs(
-                self.upper_roller_motor.get_velocity().value_as_double
-                - target_rps 
-            )
+            abs(self.upper_roller_motor.get_velocity().value_as_double - target_rps)
             < ShooterConstants.minimum_acceptable_closed_loop_error
             and abs(
                 self.lower_roller_motor.get_velocity().value_as_double

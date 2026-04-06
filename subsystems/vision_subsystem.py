@@ -29,8 +29,8 @@ class VisionCamera:
 
 class VisionSubsystem(StateSystem):
     def __init__(self, drive_subsystem: SwerveDriveSubsystem) -> None:
-        self.drive_subsystem: SwerveDriveSubsystem = drive_subsystem    
-        
+        self.drive_subsystem: SwerveDriveSubsystem = drive_subsystem
+
         self.cameras: Tuple[VisionCamera, VisionCamera] = (
             VisionCamera(
                 VisionConstants.left_camera_name, VisionConstants.robot_to_left_camera
@@ -47,7 +47,7 @@ class VisionSubsystem(StateSystem):
 
         if not RobotBase.isReal():
             return
-        
+
         if not hasattr(self, "cameras"):
             return
 
@@ -88,4 +88,3 @@ class VisionSubsystem(StateSystem):
                     self.drive_subsystem.odometry.addVisionMeasurement(
                         robot_pose.estimatedPose.toPose2d(), robot_pose.timestampSeconds
                     )
-                    

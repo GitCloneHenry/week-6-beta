@@ -38,7 +38,7 @@ class IntakeConfigs:
     intake_slot0.k_d = 0.0
 
     limit_configs.supply_current_limit_enable = True
-    limit_configs.supply_current_limit = 80
+    limit_configs.supply_current_limit = 70
 
 
 class ShooterConfigs:
