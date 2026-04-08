@@ -1,6 +1,6 @@
 from math import pi
 from typing import Tuple
-from numpy import atan2
+from numpy import atan2, sign
 import wpilib
 
 from constants import CANConstants, DriveConstants, FieldConstants, OIConstants
@@ -85,7 +85,7 @@ class SwerveDriveSubsystem(Subsystem):
                     speeds, feedforwards
                 ),
                 PPHolonomicDriveController(
-                    PIDConstants(13.50, 5.6, 1.9), PIDConstants(9.75, 1.6, 0.6)
+                    PIDConstants(13.50, 5.6, 1.9), PIDConstants(8.2, 0.0, 0.0)
                 ),
                 robot_config,
                 lambda: DriverStation.getAlliance() == DriverStation.Alliance.kRed,
@@ -192,7 +192,9 @@ class SwerveDriveSubsystem(Subsystem):
             )
         else:
             rot = -self.apply_deadband(
-                driver_controller.getRightX(), OIConstants.drive_deadband
+                sign(driver_controller.getRightX())
+                * driver_controller.getRightX() ** 2,
+                OIConstants.drive_deadband,
             )
 
         rot_delivered: float = (

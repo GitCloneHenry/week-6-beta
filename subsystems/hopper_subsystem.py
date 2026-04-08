@@ -7,6 +7,8 @@ from state_system import *
 
 from typing import TYPE_CHECKING
 
+from subsystems.shooter_subsystem import ShooterSubsystem
+
 if TYPE_CHECKING:
     from subsystems.intake_subsystem import IntakeSubsystem
 
@@ -57,6 +59,8 @@ class HopperSubsystem(StateSystem):
         self.hopper_toggle = not self.hopper_toggle
         self.intake_subsystem.intake_toggle = self.hopper_toggle
 
+        self.intake_subsystem.set_intake_position()
+
         if self.hopper_toggle:
             self.target_hopper_position = HopperConstants.extended_position
         else:
@@ -68,4 +72,7 @@ class HopperSubsystem(StateSystem):
 
     def retract(self):
         self.hopper_toggle = False
+        self.intake_subsystem.intake_toggle = self.hopper_toggle
+
         self.target_hopper_position = HopperConstants.retracted_position
+        self.intake_subsystem.set_intake_position()

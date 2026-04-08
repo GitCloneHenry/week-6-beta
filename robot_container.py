@@ -40,13 +40,15 @@ class RobotContainer(StateSystem):
             OIConstants.driver_controller_port
         )
 
+        self.set_controller_bindings()
+        self.configure_named_commands()
+
         self.sendable_chooser: SendableChooser = AutoBuilder.buildAutoChooser()
 
-        self.set_controller_bindings()
-
     def toggle_intake(self):
-        self.intake_subsystem.toggle_intake()
+        # self.intake_subsystem.toggle_intake()
         self.hopper_subsystem.toggle_hopper()
+        self.shooter_subsystem.outtaking = False
 
     def outtake(self):
         self.hopper_subsystem.outtake()
@@ -55,10 +57,14 @@ class RobotContainer(StateSystem):
 
     def retract(self):
         self.hopper_subsystem.retract()
-        self.intake_subsystem.stop_rollers()
         self.shooter_subsystem.disable_shooter()
+        self.sho
 
-    def register_named_commands(self):
+    def configure_named_commands(self):
+        NamedCommands.registerCommand(
+            "toggle_intake",
+            InstantCommand(self.toggle_intake),
+        )
         NamedCommands.registerCommand(
             "shoot",
             InstantCommand(
@@ -66,6 +72,10 @@ class RobotContainer(StateSystem):
                     "init_shooter", "ensure_velocity", "advance_balls", "shoot"
                 )
             ),
+        )
+        NamedCommands.registerCommand(
+            "disable_shooter",
+            InstantCommand(lambda: self.shooter_subsystem.disable_shooter()),
         )
 
     def set_controller_bindings(self):
@@ -87,6 +97,8 @@ class RobotContainer(StateSystem):
         self.driver_controller.povRight().onTrue(InstantCommand(self.toggle_intake))
 
         self.driver_controller.a().onTrue(InstantCommand(self.outtake))
+
+        self.driver_controller.a().onFalse(InstantCommand(self.retract))
 
         self.driver_controller.b().onTrue(
             InstantCommand(lambda: self.intake_subsystem.toggle_intake_with_override())

@@ -41,12 +41,14 @@ class HopperConstants:
     extended_position: float = 15.5
     retracted_position: float = 0.5
 
-    minimum_acceptable_closed_loop_error: float = 1.0
+    minimum_acceptable_closed_loop_error: float = 2.0
+
+    current_threshold: float = 17.0
 
 
 class IntakeConstants:
-    intake_speed: float = KrakenX44Constants.free_speed_rpm * 0.9
-    outtake_speed: float = -KrakenX44Constants.free_speed_rpm * 0.9
+    intake_speed: float = KrakenX44Constants.free_speed_rpm * 0.6
+    outtake_speed: float = -KrakenX44Constants.free_speed_rpm * 0.6
 
 
 class ShooterConstants:
@@ -55,11 +57,11 @@ class ShooterConstants:
 
     minimum_acceptable_closed_loop_error: float = 1.0
 
-    backspin_multiplier: float = 1.15
+    backspin_multiplier: float = 1.2
     backspin_correction_multiplier: float = 2 - backspin_multiplier
 
-    topspin_multiplier: float = 1.15
-    topspin_correction_multiplier: float = 2 - topspin_multiplier
+    topspin_multiplier: float = 1.75
+    topspin_correction_multiplier: float = 1.25
 
     # Values calculated using 5962's ProjectileSimulator (https://github.com/eeveemara/frc-fire-control)
     rpm_table: Dict[float, float] = {

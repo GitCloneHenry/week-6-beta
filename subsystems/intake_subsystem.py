@@ -49,6 +49,9 @@ class IntakeSubsystem(StateSystem):
     def toggle_intake(self):
         self.intake_toggle = not self.intake_toggle
 
+        self.set_intake_position()
+
+    def set_intake_position(self):
         if self.intake_toggle:
             self.target_intake_speed = IntakeConstants.intake_speed
         else:

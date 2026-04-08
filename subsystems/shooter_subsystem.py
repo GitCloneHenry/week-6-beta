@@ -19,6 +19,7 @@ class ShooterSubsystem(StateSystem):
 
     idle_shooter_rps = 20
     target_shooter_rps: float | None = None
+    outtaking = False
 
     def __init__(self, robot_drive: SwerveDriveSubsystem):
         # Initialize the state machine
@@ -45,6 +46,7 @@ class ShooterSubsystem(StateSystem):
         else:
             target_rps: float = self.idle_shooter_rps
 
+        if not self.target_shooter_rps and not self.outtaking:
             time = wpilib.Timer.getFPGATimestamp() * 7.5 * pi
             power_applied: float = (
                 (self.sign(sin(time)) * (abs(sin(time)) ** 1.2) + 0.1 * sin(10 * time))
@@ -112,12 +114,34 @@ class ShooterSubsystem(StateSystem):
             else self.idle_shooter_rps
         )
 
+        robot_pose: Pose2d = self.robot_drive.get_pose()
+
+        in_center: bool = (
+            FieldConstants.blue_alliance_end
+            < robot_pose.X()
+            < FieldConstants.red_alliance_start
+        )
+
+        upper_multiplier: float = (
+            ShooterConstants.topspin_multiplier
+            if in_center
+            else ShooterConstants.backspin_correction_multiplier
+        )
+        lower_multiplier: float = (
+            ShooterConstants.topspin_correction_multiplier
+            if in_center
+            else ShooterConstants.backspin_multiplier
+        )
+
         return_condition = (
-            abs(self.upper_roller_motor.get_velocity().value_as_double - target_rps)
+            abs(
+                self.upper_roller_motor.get_velocity().value_as_double
+                - target_rps * upper_multiplier
+            )
             < ShooterConstants.minimum_acceptable_closed_loop_error
             and abs(
                 self.lower_roller_motor.get_velocity().value_as_double
-                + target_rps * ShooterConstants.backspin_multiplier
+                + target_rps * lower_multiplier
             )
             < ShooterConstants.minimum_acceptable_closed_loop_error
         )
@@ -150,6 +174,11 @@ class ShooterSubsystem(StateSystem):
         )
 
     def outtake(self):
+        self.outtaking = True
+
+        self.trigger_motor.set_control(
+            VelocityVoltage(-ShooterConstants.conveyor_motor_rps)
+        )
         self.conveyor_motor.set_control(
             VelocityVoltage(-ShooterConstants.conveyor_motor_rps)
         )
@@ -160,4 +189,5 @@ class ShooterSubsystem(StateSystem):
         self.conveyor_motor.stopMotor()
         self.trigger_motor.stopMotor()
         self.target_shooter_rps = None
+        self.outtaking = False
         self.clear_queue()
