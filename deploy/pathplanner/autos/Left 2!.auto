@@ -7,25 +7,37 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left to Center"
+            "pathName": "Left FHalf2"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left to Shoot"
+            "pathName": "Left FHalf2-1"
           }
         },
         {
           "type": "wait",
           "data": {
-            "waitTime": 4.75
+            "waitTime": 3.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left Shoot to Mid"
+            "pathName": "Left FHalf2-2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Left FHalf2-3"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.5
           }
         }
       ]

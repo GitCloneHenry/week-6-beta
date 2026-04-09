@@ -359,7 +359,7 @@ class FieldConstants:
     # red_hub_pose = Pose2d(11.834, 4.035, Rotation2d(0))
     red_hub_pose = Pose2d(11.920, 4.035, Rotation2d(0))
     # blue_hub_pose = Pose2d(4.706, 4.035, Rotation2d(0))
-    blue_hub_pose = Pose2d(4.630, 4.035, Rotation2d(0))
+    blue_hub_pose = Pose2d(4.530, 4.035, Rotation2d(0))
 
     blue_alliance_end: float = 5.150
     red_alliance_start: float = 11.400

@@ -58,7 +58,6 @@ class RobotContainer(StateSystem):
     def retract(self):
         self.hopper_subsystem.retract()
         self.shooter_subsystem.disable_shooter()
-        self.sho
 
     def configure_named_commands(self):
         NamedCommands.registerCommand(

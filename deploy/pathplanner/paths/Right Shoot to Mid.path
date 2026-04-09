@@ -110,10 +110,10 @@
     }
   ],
   "globalConstraints": {
-    "maxVelocity": 4.0,
+    "maxVelocity": 4.25,
     "maxAcceleration": 8.0,
-    "maxAngularVelocity": 360.0,
-    "maxAngularAcceleration": 480.0,
+    "maxAngularVelocity": 240.0,
+    "maxAngularAcceleration": 360.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
@@ -122,7 +122,7 @@
     "rotation": 97.35237935989211
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Right 1.5",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -145.30484646876607
