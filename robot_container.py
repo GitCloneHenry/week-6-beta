@@ -88,6 +88,12 @@ class RobotContainer(StateSystem):
             )
         )
 
+        self.driver_controller.leftTrigger().onTrue(
+            InstantCommand(
+                lambda: self.drive_subsystem.reset_i_accumulator(), self.drive_subsystem
+            )
+        )
+
         self.driver_controller.leftBumper().onTrue(
             InstantCommand(
                 lambda: self.drive_subsystem.zero_heading(), self.drive_subsystem

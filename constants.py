@@ -339,19 +339,21 @@ class VisionConstants:
 
     robot_to_left_camera = Transform3d(
         Translation3d(
-            inchesToMeters(-12.9004),
+            # inchesToMeters(-12.9004),
+            inchesToMeters(-4.0),
             inchesToMeters(-0.995855),
             inchesToMeters(14.492716),
         ),
-        Rotation3d(pi / 6, pi - (14.551811 + 2.5) * pi / 180, 0),
+        Rotation3d(pi / 6, pi - (14.551811 + 4) * pi / 180, 0),
     )
     robot_to_right_camera = Transform3d(
         Translation3d(
-            inchesToMeters(-12.9004),
+            # inchesToMeters(-12.9004),
+            inchesToMeters(-4.0),
             inchesToMeters(0.995855),
             inchesToMeters(14.492716),
         ),
-        Rotation3d(pi / 6, pi + (14.551811 - 2.5) * pi / 180, 0),
+        Rotation3d(pi / 6, pi + (14.551811 - 4) * pi / 180, 0),
     )
 
 

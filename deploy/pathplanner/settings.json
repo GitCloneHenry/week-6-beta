@@ -5,13 +5,14 @@
   "pathFolders": [
     "Left 1.5",
     "Left 2!!!",
-    "Testing",
+    "Home Auto",
     "Right 1.5",
-    "Right 2!!!"
+    "Right 2!!!",
+    "Testing"
   ],
   "autoFolders": [],
-  "defaultMaxVel": 4.25,
-  "defaultMaxAccel": 3.0,
+  "defaultMaxVel": 2.0,
+  "defaultMaxAccel": 2.0,
   "defaultMaxAngVel": 240.0,
   "defaultMaxAngAccel": 360.0,
   "defaultNominalVoltage": 12.0,

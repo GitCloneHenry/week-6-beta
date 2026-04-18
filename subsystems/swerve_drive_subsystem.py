@@ -67,8 +67,8 @@ class SwerveDriveSubsystem(Subsystem):
     def __init__(self) -> None:
         self.theta_pid_controller: ProfiledPIDControllerRadians = (
             ProfiledPIDControllerRadians(
-                0.7,
-                0.1,
+                0.95,
+                0.0,
                 0.0,
                 TrapezoidProfileRadians.Constraints(
                     DriveConstants.max_angular_speed_rps,
@@ -179,6 +179,9 @@ class SwerveDriveSubsystem(Subsystem):
             speeds
         )
         self.set_module_states(swerve_module_states)
+
+    def reset_i_accumulator(self):
+        self.theta_pid_controller.reset(self.get_pose().rotation().radians())
 
     def default_drive(
         self, driver_controller: CommandXboxController, field_relative: bool = True

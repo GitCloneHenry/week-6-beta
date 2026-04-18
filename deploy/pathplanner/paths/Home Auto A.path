@@ -1,0 +1,71 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 4.401455555555555,
+        "y": 7.426066666666667
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.401455555555555,
+        "y": 7.426066666666667
+      },
+      "isLocked": false,
+      "linkedName": "Home Auto Start"
+    },
+    {
+      "anchor": {
+        "x": 7.0422,
+        "y": 6.061844444444444
+      },
+      "prevControl": {
+        "x": 7.0422,
+        "y": 7.3362449288165665
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "Home Auto Out End"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.34965034965035013,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [
+    {
+      "name": "toggle_intake",
+      "waypointRelativePos": 0,
+      "endWaypointRelativePos": null,
+      "command": {
+        "type": "named",
+        "data": {
+          "name": "toggle_intake"
+        }
+      }
+    }
+  ],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 240.0,
+    "maxAngularAcceleration": 360.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 2.0,
+    "rotation": -104.34933204294722
+  },
+  "reversed": false,
+  "folder": "Home Auto",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}

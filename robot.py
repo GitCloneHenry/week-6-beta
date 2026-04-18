@@ -1,6 +1,5 @@
 from robot_container import RobotContainer
 from commands2 import Command, CommandScheduler
-from wpilib import RobotController
 from wpilib import SmartDashboard, Field2d
 
 import wpilib

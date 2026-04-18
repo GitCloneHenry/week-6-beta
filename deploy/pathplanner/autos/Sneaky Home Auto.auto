@@ -1,0 +1,61 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Sneaky Pete"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Home Auto A"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Home Auto B"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Home Auto C"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Home Auto B"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.5
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
