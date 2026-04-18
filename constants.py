@@ -285,8 +285,8 @@ class DriveConstants:
     max_angular_speed_rps: float = 2 * pi
     slow_mode_multiplier: float = 0.3
 
-    track_width_m: float = 0.5969
-    wheel_base_m: float = 0.5969
+    track_width_m: float = 0.54
+    wheel_base_m: float = 0.54
     drive_kinematics: SwerveDrive4Kinematics = SwerveDrive4Kinematics(
         Translation2d(wheel_base_m / 2, track_width_m / 2),
         Translation2d(wheel_base_m / 2, -track_width_m / 2),
@@ -343,7 +343,7 @@ class VisionConstants:
             inchesToMeters(-0.995855),
             inchesToMeters(14.492716),
         ),
-        Rotation3d(pi / 6, pi - 14.551811 * pi / 180, 0),
+        Rotation3d(pi / 6, pi - (14.551811 + 2.5) * pi / 180, 0),
     )
     robot_to_right_camera = Transform3d(
         Translation3d(
@@ -351,7 +351,7 @@ class VisionConstants:
             inchesToMeters(0.995855),
             inchesToMeters(14.492716),
         ),
-        Rotation3d(pi / 6, pi + 14.551811 * pi / 180, 0),
+        Rotation3d(pi / 6, pi + (14.551811 - 2.5) * pi / 180, 0),
     )
 
 
@@ -359,7 +359,7 @@ class FieldConstants:
     # red_hub_pose = Pose2d(11.834, 4.035, Rotation2d(0))
     red_hub_pose = Pose2d(11.920, 4.035, Rotation2d(0))
     # blue_hub_pose = Pose2d(4.706, 4.035, Rotation2d(0))
-    blue_hub_pose = Pose2d(4.530, 4.035, Rotation2d(0))
+    blue_hub_pose = Pose2d(4.605, 4.035, Rotation2d(0))
 
     blue_alliance_end: float = 5.150
     red_alliance_start: float = 11.400

@@ -7,25 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Left to Center"
+            "pathName": "New New Path"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left to Shoot"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 4.75
+            "pathName": "New New Path"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Left Shoot to Mid"
+            "pathName": "New New Path"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "New New Path"
           }
         }
       ]

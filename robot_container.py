@@ -3,6 +3,7 @@ from state_system import *
 
 from commands2 import InstantCommand, ProxyCommand, RunCommand, SequentialCommandGroup
 from commands2.button import CommandXboxController
+from commands2.sysid import SysIdRoutine
 
 from subsystems.hopper_subsystem import HopperSubsystem
 from subsystems.intake_subsystem import IntakeSubsystem

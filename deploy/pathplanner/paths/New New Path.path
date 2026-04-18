@@ -1,0 +1,111 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.0039657631954344,
+        "y": 3.0710699001426542
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.8146473978732143,
+        "y": 4.080484012321944
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.66756062767475,
+        "y": 5.7364336661911555
+      },
+      "prevControl": {
+        "x": 3.5648720767219078,
+        "y": 5.234761220335086
+      },
+      "nextControl": {
+        "x": 2.34218337069988,
+        "y": 5.918346874259387
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.150014265335235,
+        "y": 4.998930099857347
+      },
+      "prevControl": {
+        "x": 2.0720865615675597,
+        "y": 5.6681232573170295
+      },
+      "nextControl": {
+        "x": 2.235902680543623,
+        "y": 4.261375456468121
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.9947503566333804,
+        "y": 3.045192582025678
+      },
+      "prevControl": {
+        "x": 1.5619224977266557,
+        "y": 3.5102196548355376
+      },
+      "nextControl": {
+        "x": 2.2705231130112877,
+        "y": 2.748904357919565
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.0039657631954344,
+        "y": 3.0710699001426542
+      },
+      "prevControl": {
+        "x": 2.788888780591049,
+        "y": 2.9436262202138597
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.1084337349397488,
+      "rotationDegrees": 138.64930100249524
+    },
+    {
+      "waypointRelativePos": 2.3650156180276496,
+      "rotationDegrees": 173.93705247302654
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 2.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 240.0,
+    "maxAngularAcceleration": 360.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -159.04422326936785
+  },
+  "reversed": false,
+  "folder": "Testing",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -165.5297058999341
+  },
+  "useDefaultConstraints": false
+}

@@ -19,5 +19,5 @@ requires = [
     "robotpy-pathplannerlib",
     "robotpy-ctre",
     "robotpy-rev",
-    "robotpy-native-wpilib==2026.2.1",
+    "robotpy-native-wpilib==2026.2.1"
 ]

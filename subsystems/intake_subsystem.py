@@ -21,6 +21,7 @@ class IntakeSubsystem(StateSystem):
 
     intake_toggle = False
     position_override = False
+    current_intake_speed = 0.0
     target_intake_speed = 0.0
 
     def __init__(self):
@@ -43,8 +44,10 @@ class IntakeSubsystem(StateSystem):
             return
 
         if self.hopper_subsystem.at_target() or self.position_override:
-            self.right_intake.set_control(VelocityVoltage(-self.target_intake_speed))
+            self.current_intake_speed = self.target_intake_speed
             self.position_override = False
+
+        self.right_intake.set_control(VelocityVoltage(-self.current_intake_speed))
 
     def toggle_intake(self):
         self.intake_toggle = not self.intake_toggle
@@ -59,6 +62,9 @@ class IntakeSubsystem(StateSystem):
 
     def toggle_intake_with_override(self):
         self.toggle_intake()
+        self.position_override = True
+
+    def force_run(self):
         self.position_override = True
 
     def outtake(self):

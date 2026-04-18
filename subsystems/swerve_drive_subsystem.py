@@ -19,6 +19,10 @@ from pathplannerlib.auto import AutoBuilder
 from pathplannerlib.config import RobotConfig, PIDConstants
 from pathplannerlib.util import DriveFeedforwards
 
+import math
+
+from commands2.sysid import SysIdRoutine
+from wpilib.sysid import SysIdRoutineLog
 
 class SwerveDriveSubsystem(Subsystem):
     front_left: SwerveModuleSubsystem = SwerveModuleSubsystem(
@@ -85,7 +89,7 @@ class SwerveDriveSubsystem(Subsystem):
                     speeds, feedforwards
                 ),
                 PPHolonomicDriveController(
-                    PIDConstants(13.50, 5.6, 1.9), PIDConstants(8.2, 0.0, 0.0)
+                    PIDConstants(2.8, 0.0, 0.0), PIDConstants(8.2, 0.0, 0.0)
                 ),
                 robot_config,
                 lambda: DriverStation.getAlliance() == DriverStation.Alliance.kRed,
@@ -93,6 +97,30 @@ class SwerveDriveSubsystem(Subsystem):
             )
         except:
             wpilib.reportError("Error creating configs!")
+        
+        self.sysid_active = False
+        self.volts: float = 0.0
+
+        def apply_voltage(volts: float):
+            self.volts = volts
+            self.sysid_active = True
+            self.drive_sysid_rotation(volts)
+
+        def log_data(log: SysIdRoutineLog):
+            log.motor("swerve-rot") \
+                .voltage(self.volts) \
+                .angularVelocity(
+                    self.gyro.get_angular_velocity_z_world().value / 360.0
+                )
+        
+        self.sysid = SysIdRoutine(
+            SysIdRoutine.Config(),
+            SysIdRoutine.Mechanism(
+                apply_voltage,
+                log_data,
+                self
+            )
+        )
 
     def periodic(self) -> None:
         self.odometry.update(
@@ -191,11 +219,7 @@ class SwerveDriveSubsystem(Subsystem):
                 robot_pose.rotation().radians(), pi - angle_to_hub
             )
         else:
-            rot = -self.apply_deadband(
-                sign(driver_controller.getRightX())
-                * driver_controller.getRightX() ** 2,
-                OIConstants.drive_deadband,
-            )
+            rot = -self.apply_deadband(driver_controller.getRightX(), OIConstants.drive_deadband)
 
         rot_delivered: float = (
             rot
@@ -292,3 +316,18 @@ class SwerveDriveSubsystem(Subsystem):
             )
         else:
             wpilib.reportError("Couldn't get alliance!")
+
+
+    def drive_sysid_rotation(self, voltage: float):
+        states = DriveConstants.drive_kinematics.toSwerveModuleStates(
+            ChassisSpeeds(0.0, 0.0, 1.0)
+        )
+
+        SwerveDrive4Kinematics.desaturateWheelSpeeds(
+            states, 1.0
+        )
+
+        self.front_left.set_voltage(voltage, states[0].angle)
+        self.front_right.set_voltage(voltage, states[1].angle)
+        self.back_left.set_voltage(voltage, states[2].angle)
+        self.back_right.set_voltage(voltage, states[3].angle)

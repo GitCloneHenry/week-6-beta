@@ -92,3 +92,17 @@ class SwerveModuleSubsystem:
 
     def reset_encoders(self) -> None:
         self.driving_encoder.setPosition(0)
+
+
+    def set_voltage(self, voltage: float, angle: Rotation2d) -> None:
+        corrected_angle = angle.rotateBy(Rotation2d(self.chassis_angular_offset))
+
+        optimized = SwerveModuleState(0.0, corrected_angle)
+        optimized.optimize(Rotation2d(self.turning_encoder.getPosition()))
+
+        self.turning_closed_loop_controller.setSetpoint(
+            optimized.angle.radians(),
+            SparkBase.ControlType.kPosition
+        )
+
+        self.driving_spark.setVoltage(voltage)
