@@ -71,8 +71,8 @@ class HopperSubsystem(StateSystem):
         self.target_hopper_position = HopperConstants.extended_position
 
     def retract(self):
-        self.hopper_toggle = False
-        self.intake_subsystem.intake_toggle = self.hopper_toggle
+        # self.hopper_toggle = False
+        self.intake_subsystem.intake_toggle = False
 
-        self.target_hopper_position = HopperConstants.retracted_position
+        # self.target_hopper_position = HopperConstants.retracted_position
         self.intake_subsystem.set_intake_position()

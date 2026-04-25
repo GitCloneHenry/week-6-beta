@@ -5,7 +5,8 @@ from state_system import *
 
 from robotpy_apriltag import AprilTagFieldLayout, AprilTagField
 
-from wpimath.geometry import Pose3d, Transform3d
+from wpimath.geometry import Pose3d, Transform3d, Rotation2d, Pose2d
+from wpimath.units import degreesToRadians
 
 from photonlibpy import PhotonCamera, PhotonPoseEstimator
 
@@ -58,33 +59,53 @@ class VisionSubsystem(StateSystem):
         except RuntimeError as e:
             raise e
 
+        current_gyro_rotation: Rotation2d = self.drive_subsystem.get_pose().rotation()
+
         for camera in self.cameras:
-            camera_results: List[PhotonPipelineResult] = (
-                camera.camera.getAllUnreadResults()
-            )
+            result: PhotonPipelineResult = camera.camera.getLatestResult()
 
-            for result in camera_results:
-                if not result.hasTargets():
-                    continue
+            if not result.hasTargets():
+                continue
 
-                best_target: PhotonTrackedTarget | None = result.getBestTarget()
+            multi_tag_result = result.multitagResult
 
-                if best_target == None:
-                    continue
+            target: PhotonTrackedTarget | None = result.getBestTarget()
 
-                potential_tag_pose: Pose3d | None = (
-                    self.april_tag_field_layout.getTagPose(best_target.getFiducialId())
+            if target == None:
+                continue
+
+            # distance = target.getBestCameraToTarget().translation().norm()
+            # ambiguity = target.getPoseAmbiguity()
+
+            vision_pose = camera.estimator.estimateCoprocMultiTagPose(result)
+            
+            if vision_pose is None:
+                vision_pose = camera.estimator.estimateLowestAmbiguityPose(result)
+
+            if vision_pose is not None:
+                robot_pose = vision_pose.estimatedPose.toPose2d()
+            else:
+                continue
+
+            # if multi_tag_result is not None:
+            #     x_stdev = 0.04
+            #     y_stdev = 0.04
+
+            #     if distance <= 2.5:
+            #         theta_stdev = degreesToRadians(0.1)
+            #     else:
+            #         theta_stdev = float("inf")
+            # else:
+            #     if distance <= 2.5 and ambiguity < 0.2:
+            #         x_stdev = 0.1 * (distance ** 2)
+            #         y_stdev = 0.1 * (distance ** 2)
+            #         theta_stdev = 0.2 * (distance ** 2)
+            #     else:
+            #         x_stdev = 0.2 * (distance ** 2)
+            #         y_stdev = 0.2 * (distance ** 2)
+            #         theta_stdev = float("inf")
+                    
+            if RobotBase.isReal():
+                self.drive_subsystem.odometry.addVisionMeasurement(
+                    robot_pose, vision_pose.timestampSeconds # , (x_stdev, y_stdev, theta_stdev)
                 )
-
-                if not potential_tag_pose == None:
-                    self.best_april_tag_pose = potential_tag_pose.toPose2d()
-
-                robot_pose = camera.estimator.estimateCoprocMultiTagPose(result)
-
-                if robot_pose is None:
-                    robot_pose = camera.estimator.estimateLowestAmbiguityPose(result)
-
-                if robot_pose:
-                    self.drive_subsystem.odometry.addVisionMeasurement(
-                        robot_pose.estimatedPose.toPose2d(), robot_pose.timestampSeconds
-                    )

@@ -1,6 +1,7 @@
 from phoenix6.hardware import TalonFX
 from phoenix6.signals import NeutralModeValue
 from phoenix6.controls import VelocityVoltage
+from wpilib import RobotBase
 from configs import ShooterConfigs
 from constants import CANConstants, ShooterConstants, FieldConstants
 from configs import ShooterConfigs

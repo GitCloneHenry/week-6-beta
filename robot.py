@@ -6,6 +6,8 @@ import wpilib
 
 from wpilib import DataLogManager, DriverStation
 
+from constants import FieldConstants
+
 class Robot(wpilib.TimedRobot):
     robot_container = RobotContainer()
     field = Field2d()
@@ -20,6 +22,8 @@ class Robot(wpilib.TimedRobot):
 
     def robotPeriodic(self):
         self.field.setRobotPose(self.robot_container.drive_subsystem.get_pose())
+
+        print(FieldConstants.get_hub_dist(self.robot_container.drive_subsystem.get_pose()))
 
         CommandScheduler.getInstance().run()
 
